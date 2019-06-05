@@ -106,15 +106,7 @@ public class UserGUI extends JFrame implements ActionListener {
 
       roomLabel = new JLabel();
       roomLabel.setFont(new Font("Meiryo", Font.PLAIN, 28));
-      String roomName = "";
-      try {
-         roomName = roomname;
-         // roomName += room.getRoomName();
-      } catch (Exception e) {
-         roomName += "Room";
-         System.out.println("> [UserGUI] Error to get Room Name: " + e);
-      }
-      roomLabel.setText(roomName);
+      roomLabel.setText(roomname);
 
       JLabel userLabel = new JLabel();
       userLabel.setText(" [ " + username + " ]");
@@ -198,8 +190,6 @@ public class UserGUI extends JFrame implements ActionListener {
 
       for (int i = 0; i < 5; i++)
          listModel.addElement("Sala" + i);
-      // for (int i = 0; i < roomList.size(); i++)
-      // listModel.addElement(roomList.get(i));
 
       list = new JList<String>(listModel);
       list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
