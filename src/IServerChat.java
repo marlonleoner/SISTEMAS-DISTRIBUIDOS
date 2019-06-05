@@ -4,10 +4,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- *
- * @author MarlonLeoner
- */
 public interface IServerChat extends Remote {
 
     // Retorna todas as salas do servidor
