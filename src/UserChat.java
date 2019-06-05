@@ -1,19 +1,20 @@
-import java.rmi.*;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-/**
- *
- * @author marlonleoner
- */
-public class UserChat  extends UnicastRemoteObject implements IUserChat {
+public class UserChat extends UnicastRemoteObject implements IUserChat {
 
-   private User userGUI;
+   // PORT
+   private static final int RMI_PORT = 2020;
+   // URL
+   private static final String RMI_HOST = "rmi://localhost/";
 
-   public UserChat(User userGUI) throws RemoteException {
+   private UserGUI userGUI;
+
+   public UserChat(UserGUI userGUI) throws RemoteException {
       this.userGUI = userGUI;
    }
 
    public void deliverMsg(String senderName, String msg) throws RemoteException {
-      userGUI.sendMessage(senderName, msg);
+      userGUI.receiveMessage(senderName, msg);
    }
 }
