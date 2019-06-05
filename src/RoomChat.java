@@ -3,11 +3,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- *
- * @author marlonleoner
- */
 public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
    // Nome da Sala
@@ -22,9 +17,9 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
    @Override
    public void joinRoom(String userName, IUserChat user) throws RemoteException {
-      String sender  = "Room";
-      String message = userName + " joined";
-      System.out.println("> [" + sender + "] " + message + " at room \'" + name + "\'");
+      String sender  = "Server";
+      String message = userName + " joined at room \'" + name + "\'";
+      System.out.println("> [" + sender + "] " + message);
 
       userList.put(userName, user);
       for (String key : userList.keySet()) {
@@ -34,7 +29,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
    @Override
    public void sendMsg(String userName, String message) throws RemoteException {
-      System.out.println("> [" + userName + "] " + message);
+      System.out.println("> [" + userName + "] " + message  );
 
       for (String key : userList.keySet()) {
          userList.get(key).deliverMsg(userName, message);
@@ -43,8 +38,11 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
    @Override
    public void leaveRoom(String usrName) throws RemoteException {
+      String sender  = "Server";
+      String message = usrName + " left the room \'" + name + "\'";
+
       if(userList.containsKey(usrName)) {
-         sendMsg(usrName, "left the room");
+         sendMsg(sender, message);
          userList.remove(usrName);
       }
    }
