@@ -1,4 +1,3 @@
-
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -10,22 +9,18 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 public class UserMain {
 
-   // PORT
-   private static final int RMI_PORT = 2020;
-   // URL
+   private static final int    RMI_PORT = 2020;
    private static final String RMI_HOST = "rmi://localhost/";
-
-   private UserGUI GUI;
 
    private Registry registry;
 
-   private IServerChat server;
-
-   private IRoomChat room;
-
-   private UserChat user;
+   private UserGUI GUI;
 
    private String username;
+
+   private IServerChat server;
+   private IRoomChat   room;
+   private UserChat    user;
 
    public static void main(String args[]) {
       try {
@@ -36,6 +31,7 @@ public class UserMain {
                break;
             }
          }
+
          UserMain main = new UserMain();
       } catch (Exception e) {
          System.out.println("> [UserGUI] Error: " + e);
@@ -49,15 +45,48 @@ public class UserMain {
       GUI  = new UserGUI(this);
       user = new UserChat(GUI);
 
-      attRoomsList();
+      new Thread(new Runnable() {
+         @Override public void run() {
+            while (true) {
+               try {
+                  List<String> rooms = server.getRooms();
+                  GUI.attRoomsList(rooms);
+                  if(room != null) {
+                     if(!rooms.contains(room.getRoomName()))
+                        GUI.removeUser();
+                  }
+
+                  Thread.sleep(500);
+               }
+               catch (RemoteException re) {
+                  System.out.println("> [UserMain] RemoteException: " + re);
+                  re.printStackTrace();
+               }
+               catch (InterruptedException ie) {
+                  System.out.println("> {UserMain] InterruptedException: " + ie);
+                  ie.printStackTrace();
+               }
+            }
+         }
+      }).start();
    }
 
    public void setName(String name) {
       username = name;
    }
 
-   public void createRoom(String roomName) throws RemoteException, NotBoundException {
-      server.createRoom(roomName);
+   public boolean createRoom(String roomName) throws RemoteException, NotBoundException {
+      if(roomName == null) {
+         return true;
+      }
+
+      List<String> rooms = server.getRooms();
+      String name = roomName.toLowerCase().replace(" ", "_");
+      if(!rooms.contains(name)) {
+         server.createRoom(name);
+         return true;
+      }
+      return false;
    }
 
    public void joinRoom(String roomName) throws RemoteException, NotBoundException {
@@ -80,5 +109,9 @@ public class UserMain {
    public void attRoomsList() throws RemoteException {
       List<String> roomsList = server.getRooms();
       GUI.attRoomsList(roomsList);
+   }
+
+   public void removeUser() {
+      room = null;
    }
 }
