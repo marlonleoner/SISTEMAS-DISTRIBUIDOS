@@ -4,7 +4,7 @@
 
 + Para executar o servidor utilizando o terminal:
 ~~~java
-javac ServerChat.java && java ServerChat
+javac ServerMain.java && java ServerChat
 ~~~
 
 #### Cliente
