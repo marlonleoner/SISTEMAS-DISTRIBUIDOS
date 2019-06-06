@@ -22,9 +22,10 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
       System.out.println("> [" + sender + "] " + message);
 
       userList.put(userName, user);
-      for (String key : userList.keySet()) {
-         userList.get(key).deliverMsg(sender, message);
-      }
+      sendMsg(sender, message);
+      // for (String key : userList.keySet()) {
+      //    userList.get(key).deliverMsg(sender, message);
+      // }
    }
 
    @Override
