@@ -1,5 +1,6 @@
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
@@ -10,9 +11,6 @@ import java.util.ArrayList;
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
-   // PORT
-   private static final int RMI_PORT = 2020;
-   // URL
    private static final String RMI_HOST = "rmi://localhost/";
 
    // Registry
@@ -21,42 +19,18 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
    private List<String> roomList;
 
    // Constructor
-   public ServerChat(String host) throws RemoteException, AlreadyBoundException {
+   public ServerChat(Registry registry) throws RemoteException, AlreadyBoundException {
       roomList = new ArrayList<>();
-      RegistryServer(host);
+      this.registry = registry;
    }
 
    /*****************
     * Local Methods *
     *****************/
 
-   public static void main(String[] args) {
-      String host = "localhost";
-
-      if (args.length == 1)
-         host = args[0];
-
-      try {
-         IServerChat server = new ServerChat(host);
-
-         // [Debug] Inicialização de duas salas
-         server.createRoom("room_1");
-         server.createRoom("room_2");
-      } catch (Exception e) {
-         System.out.println("> [System] Server failed: " + e);
-      }
-   }
-
-   /**
-    * Start the RMI Registry
-    */
-   public void RegistryServer(String hostName) throws RemoteException, AlreadyBoundException {
-      System.out.println("> [System] Starting Server...");
-
-      registry = LocateRegistry.createRegistry(RMI_PORT);
-      registry.bind(RMI_HOST + "Servidor", this);
-
-      System.out.println("> [System] Server Online!");
+   public void removeRoom(String room) throws RemoteException, NotBoundException {
+      roomList.remove(room);
+      registry.unbind(RMI_HOST + room);
    }
 
    /******************
@@ -70,14 +44,17 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
    @Override
    public void createRoom(String roomName) throws RemoteException {
-      String name = roomName.toLowerCase().replace(" ", "_");
-      try {
-         IRoomChat room = new RoomChat(name);
-         registry.bind(RMI_HOST + name, room);
-         roomList.add(name);
-         System.out.println("> [Server] Room \'" + name + "\' created");
-      } catch (Exception e) {
-         System.out.println("> [Server] Failed to create room \'" + name + "\': " + e);
+      if(roomName != null) {
+         try {
+            IRoomChat room = new RoomChat(roomName);
+            registry.bind(RMI_HOST + roomName, room);
+            roomList.add(roomName);
+            System.out.println("> [Server] Room \'" + roomName + "\' created");
+         }
+         catch (Exception e) {
+            System.out.println("> [Server] Failed to create room \'" + roomName + "\': " + e);
+            e.printStackTrace();
+         }
       }
    }
 }
