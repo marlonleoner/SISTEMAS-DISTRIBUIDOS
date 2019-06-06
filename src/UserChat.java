@@ -3,13 +3,13 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class UserChat extends UnicastRemoteObject implements IUserChat {
 
-   private UserGUI userGUI;
+   private UserGUI GUI;
 
    public UserChat(UserGUI userGUI) throws RemoteException {
-      this.userGUI = userGUI;
+      this.GUI = userGUI;
    }
 
    public void deliverMsg(String senderName, String msg) throws RemoteException {
-      userGUI.receiveMessage(senderName, msg);
+      GUI.receiveMessage(senderName, msg);
    }
 }
