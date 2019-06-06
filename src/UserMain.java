@@ -10,7 +10,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 public class UserMain {
 
    private static final int    RMI_PORT = 2020;
-   private static final String RMI_HOST = "rmi://localhost/";
+   private String              RMI_HOST;
 
    private Registry registry;
 
@@ -32,13 +32,19 @@ public class UserMain {
             }
          }
 
-         UserMain main = new UserMain();
+         if(args.length != 1) {
+            System.out.println("Error! Try: java UserMain <ip>");
+            System.exit(-1);
+         }
+
+         UserMain main = new UserMain(args[0]);
       } catch (Exception e) {
          System.out.println("> [UserGUI] Error: " + e);
       }
    }
 
-   public UserMain() throws RemoteException, NotBoundException {
+   public UserMain(String host) throws RemoteException, NotBoundException {
+      RMI_HOST = "rmi://" + host + "/";
       registry = LocateRegistry.getRegistry(RMI_PORT);
       server   = (IServerChat) registry.lookup(RMI_HOST + "Servidor");
 
@@ -76,9 +82,8 @@ public class UserMain {
    }
 
    public boolean createRoom(String roomName) throws RemoteException, NotBoundException {
-      if(roomName == null) {
+      if(roomName == null)
          return true;
-      }
 
       List<String> rooms = server.getRooms();
       String name = roomName.toLowerCase().replace(" ", "_");
