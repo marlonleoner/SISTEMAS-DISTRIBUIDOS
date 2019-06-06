@@ -23,9 +23,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
       userList.put(userName, user);
       sendMsg(sender, message);
-      // for (String key : userList.keySet()) {
-      //    userList.get(key).deliverMsg(sender, message);
-      // }
    }
 
    @Override
@@ -50,7 +47,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
 
    @Override
    public void closeRoom() throws RemoteException {
-      sendMsg("Room", "room closed by server");
+      sendMsg("Server", "Room closed by server");
       userList.clear();
    }
 
