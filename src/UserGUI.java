@@ -44,10 +44,10 @@ public class UserGUI extends JFrame implements ActionListener {
    }
 
    public void initComponents() {
-      meiryoFont = new Font("Meiryo", Font.PLAIN, 14);
+      meiryoFont  = new Font("Meiryo", Font.PLAIN, 14);
       blankBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 
-      frame = new JFrame("[Chat] T2 - Sistemas Distribuidos");
+      frame = new JFrame("[" + username + "] - [ChatRMI] T2 - Sistemas Distribuidos");
 
       /*
        * intercept close method, inform server we are leaving then let the system
@@ -86,9 +86,7 @@ public class UserGUI extends JFrame implements ActionListener {
 
       frame.add(chatPanel);
       frame.pack();
-      frame.setAlwaysOnTop(true);
       frame.setLocation(150, 150);
-      inputTextMsg.requestFocus();
 
       frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
       frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -184,15 +182,8 @@ public class UserGUI extends JFrame implements ActionListener {
    public JPanel getRoomsPanel() {
       JPanel roomsPanel = new JPanel(new BorderLayout());
 
-      String[] noClientsYet = { "No other users" };
-
-      listModel = new DefaultListModel<String>();
-
-      for (int i = 0; i < 5; i++)
-         listModel.addElement("Sala" + i);
-
-      list = new JList<String>(listModel);
-      list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+      list = new JList<String>();
+      list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       list.setVisibleRowCount(8);
       list.setFont(meiryoFont);
       list.addListSelectionListener(new ListSelectionListener(){
@@ -237,7 +228,7 @@ public class UserGUI extends JFrame implements ActionListener {
             message = inputTextMsg.getText();
             if (!message.isEmpty()) {
                inputTextMsg.setText("");
-               // room.sendMsg(username, message);
+               main.sendMessage(message);
             }
          }
          else if(button == actionRoomButton) {
@@ -261,7 +252,7 @@ public class UserGUI extends JFrame implements ActionListener {
             inputTextMsg.setText("");
          }
          else if(button == createRoomButton) {
-            main.createRoom(getNewRoomName());
+            while(!main.createRoom(getNewRoomName()));
          }
       } catch (Exception ex) {
          ex.printStackTrace();
@@ -283,7 +274,7 @@ public class UserGUI extends JFrame implements ActionListener {
 
    /**
     *
-    * @return String Username
+    * @return String Roomname
     */
    private String getNewRoomName() {
       return JOptionPane.showInputDialog(
@@ -309,16 +300,34 @@ public class UserGUI extends JFrame implements ActionListener {
    }
 
    public void attRoomsList(List<String> roomsList) {
-      DefaultListModel rooms = new DefaultListModel();
+       String value = list.getSelectedValue();
+       DefaultListModel listModel = new DefaultListModel();
 
       for (int i = 0; i < roomsList.size(); i++) {
          String roomName = roomsList.get(i);
          if(!roomName.equals("servidor")) {
-            rooms.addElement(roomName);
+            listModel.addElement(roomName);
          }
       }
 
-      list.setModel(rooms);
+      list.setModel(listModel);
+      if(listModel.contains(value))
+         list.setSelectedValue(value, true);
+      else {
+         if(actionRoomButton.getText().equals("Join"))
+            actionRoomButton.setEnabled(false);
+      }
+   }
+
+   public void removeUser() {
+      actionRoomButton.setText("Join");
+      actionRoomButton.setEnabled(false);
+      list.setEnabled(true);
+      roomLabel.setText("Choose a Room");
+      inputTextMsg.setText("");
+      inputTextMsg.setEnabled(false);
+      sendButton.setEnabled(false);
+      main.removeUser();
    }
 
    /*************************
@@ -335,7 +344,6 @@ public class UserGUI extends JFrame implements ActionListener {
    private JPanel roomsPanel;
    private JButton createRoomButton, actionRoomButton;
    private JList<String> list;
-   private DefaultListModel<String> listModel;
 
    // Chat Messages
    private JPanel messagesPanel;
